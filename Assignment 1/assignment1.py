@@ -15,6 +15,7 @@ def frequency(cipher):
         else:
             frequencydict[text] =  1
     #print out the letters and their frequency
+    print("FREQUENCY OF EACH LETTER IN THE CIPHER: ")
     for i in frequencydict:
         print(i, frequencydict[i])
     plot(frequencydict)
@@ -65,6 +66,7 @@ def plot_first_chunk(chunk, cipher):
                 frequencydict[letter] += 1
             else:
                 frequencydict[letter] = 1
+    print("FREQUENCY OF EACH LETTER IN THE FIRST CHUNK IN THE CIPHER: ")
     for i in frequencydict:
         print(i, frequencydict[i])
 
@@ -89,11 +91,13 @@ def get_freq_percentage(letter, frequencydict, cipherlength):
 def get_secret_key(dictionarylist):
     shift = []
     #e is the most common letter in the dictionary. We take the most common letter at each positon and assume it to be e. We try finding the shift amount accordingly
+    position = 0
     for i in dictionarylist:
         i = sorted(i.items(), key=lambda tup: tup[1], reverse=True)
         #Adding shift amount of each position to an array
         shift.append(ord(i[0][0]) - ord('e') )
-        print(i)
+        position += 1
+        print("POSITION ", position, " FREQUENCY ANALYSIS: ",i)
         print(shift)
 
     secretkey = ''
@@ -105,7 +109,7 @@ def get_secret_key(dictionarylist):
         else:
             #this is for the wrap around case ie. a - 2 = y 
             secretkey += chr(26 + lettershift + 97)  
-    print(secretkey)
+    print("SECRET KEY:" , secretkey)
     return secretkey, shift
 
 #question 4
