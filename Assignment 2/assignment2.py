@@ -37,8 +37,6 @@ def question1(g, p, sks):
     #print(pk)
 
 def question2():
-    import hashlib
-    
     
     hashobj = hashlib.sha3_224()
     
@@ -90,6 +88,7 @@ def generate_signature(message, p, q, g, sk):
     print((hashed_num - sk * r)  * mod_inverse(k, q))
     print('r ', r)
     print('s ', s)
+    return hashed_num, r, s, y
 
     # ex:
     # print("s ", ((22 - 5 * 3) * mod_inverse(8, 11)) % 11)
@@ -98,8 +97,30 @@ def generate_signature(message, p, q, g, sk):
     # print("sha3_224 hash in hex: ", obj_sha3_224)
 
 
-def verify_signature(message, r, s, g, p, q, pk):
-    pass
+def verify_signature(hashed_message, r, s, g, p, q, pk):
+    if r < 0 or r > p or s < 0 or s > p:
+        print ("verification rejected ")
+        return False
+
+    # u = hashed_num * s inverse mod q, 
+    # and v = -r * s inverse mod q
+    s1 = mod_inverse(s, q)
+    u = hashed_message * mod_inverse(s, q) % q
+    v = (-r * s1) % q
+
+    print("u: ", u)
+    print("v: ", v)
+
+    arg1 = pow(g, u, p)
+    arg2 = pow(pk, v, p)
+
+    w = arg1 * arg2
+    w = pow(w, 1, p)
+    print("w", w)
+
+    if r == w:
+        print("verification succesful ")
+        return True
 
 
 def generate_message(pk1, pk2, amnt):
@@ -121,9 +142,10 @@ def selector():
         question1(g,p,sks)
         question3(pk[0], pk[1], 2)
     elif selected =='4':
-        # generate_signature(45, p, q, g, sk1)
-        generate_signature(45, 23, 11, 2, 5)
+        hash_msg, generated_r, generated_s, y = generate_signature(45, p, q, g, sk1)
+        # generate_signature(45, 23, 11, 2, 5)
 
+        verify_signature(hash_msg, generated_r , generated_s, g, p, q, y)
 
 selector()
     
