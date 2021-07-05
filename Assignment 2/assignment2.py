@@ -1,10 +1,25 @@
+from random import randint
+import hashlib
+import sys
+from sympy import mod_inverse
 
+if sys.version_info < (3, 6):
+    import sha3
 
 p = 168199388701209853920129085113302407023173962717160229197318545484823101018386724351964316301278642143567435810448472465887143222934545154943005714265124445244247988777471773193847131514083030740407543233616696550197643519458134465700691569680905568000063025830089599260400096259430726498683087138415465107499
 
 sks = [432398415306986194693973996870836079581453988813,165849943586922055423650237226339279137759546603,627658512551971075308886219669315148725310346887 ]
 
 g = 94389192776327398589845326980349814526433869093412782345430946059206568804005181600855825906142967271872548375877738949875812540433223444968461350789461385043775029963900638123183435133537262152973355498432995364505138912569755859623649866375135353179362670798771770711847430626954864269888988371113567502852
+
+q = 959452661475451209325433595634941112150003865821
+
+
+sk1 = 432398415306986194693973996870836079581453988813
+sk2 = 165849943586922055423650237226339279137759546603
+sk3 = 627658512551971075308886219669315148725310346887
+
+amnt0, amnt1, amnt2, amnt3 = 1, 2, 3, 4
 
 pk = []
 
@@ -44,6 +59,49 @@ def question3(pk1, pk2, amnt):
     generate_message(pk1,pk2,amnt)
 
 
+def generate_signature(message, p, q, g, sk):
+    k = randint(0, p-1)
+
+    hashobj = hashlib.sha3_224()
+    # hashed_num = int.from_bytes(hashlib.sha3_224(message.encode()).digest(), byteorder='big' )
+
+
+    integer = hex(message)
+    integer = integer[2:]
+    integer = bytes(integer, encoding='utf-8')
+
+    hashobj.update(integer)
+    hashed = str(hashobj.hexdigest())
+    hashed_num = int(hashed, 16)
+
+    print("hashed_num ", hashed_num)
+    
+    # secret key sk1 ~ x
+    print('secret key ', sk)
+    y = pow(g, sk, p) # public key
+    print('public key ', y)
+
+    r = pow(g, k, p)
+
+
+    # hashed_num = (sk1 * r + k * s) % q
+    s = ((hashed_num - sk * r)  * mod_inverse(k, q)) % q
+
+    print((hashed_num - sk * r)  * mod_inverse(k, q))
+    print('r ', r)
+    print('s ', s)
+
+    # ex:
+    # print("s ", ((22 - 5 * 3) * mod_inverse(8, 11)) % 11)
+
+    # obj_sha3_224 = hashlib.sha3_224(message.encode()).digest()
+    # print("sha3_224 hash in hex: ", obj_sha3_224)
+
+
+def verify_signature(message, r, s, g, p, q, pk):
+    pass
+
+
 def generate_message(pk1, pk2, amnt):
     pk1= bin(pk1)[2:401]
     pk2 = bin(pk2)[2:401]
@@ -62,6 +120,10 @@ def selector():
     elif selected =='3':
         question1(g,p,sks)
         question3(pk[0], pk[1], 2)
+    elif selected =='4':
+        # generate_signature(45, p, q, g, sk1)
+        generate_signature(45, 23, 11, 2, 5)
+
 
 selector()
     
